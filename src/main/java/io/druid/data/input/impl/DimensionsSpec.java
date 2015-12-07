@@ -35,12 +35,14 @@ import java.util.Set;
 public class DimensionsSpec
 {
   private final List<String> dimensions;
+  private final List<String> floatDimensions;
   private final Set<String> dimensionExclusions;
   private final List<SpatialDimensionSchema> spatialDimensions;
 
   @JsonCreator
   public DimensionsSpec(
       @JsonProperty("dimensions") List<String> dimensions,
+      @JsonProperty("floatDimensions") List<String> floatDimensions,
       @JsonProperty("dimensionExclusions") List<String> dimensionExclusions,
       @JsonProperty("spatialDimensions") List<SpatialDimensionSchema> spatialDimensions
   )
@@ -48,6 +50,10 @@ public class DimensionsSpec
     this.dimensions = dimensions == null
                       ? Lists.<String>newArrayList()
                       : Lists.newArrayList(dimensions);
+
+    this.floatDimensions = floatDimensions == null
+                           ? Lists.<String>newArrayList()
+                           : Lists.<String>newArrayList(floatDimensions);
 
     // Small work around for https://github.com/metamx/druid/issues/658
     Collections.sort(this.dimensions, Ordering.natural().nullsFirst());
@@ -88,13 +94,19 @@ public class DimensionsSpec
 
   public DimensionsSpec withDimensions(List<String> dims)
   {
-    return new DimensionsSpec(dims, ImmutableList.copyOf(dimensionExclusions), spatialDimensions);
+    return new DimensionsSpec(dims, floatDimensions, ImmutableList.copyOf(dimensionExclusions), spatialDimensions);
+  }
+
+  public DimensionsSpec withFloatDimensions(List<String> floatDims)
+  {
+    return new DimensionsSpec(dimensions, floatDims, ImmutableList.copyOf(dimensionExclusions), spatialDimensions);
   }
 
   public DimensionsSpec withDimensionExclusions(Set<String> dimExs)
   {
     return new DimensionsSpec(
         dimensions,
+        floatDimensions,
         ImmutableList.copyOf(Sets.union(dimensionExclusions, dimExs)),
         spatialDimensions
     );
@@ -102,7 +114,7 @@ public class DimensionsSpec
 
   public DimensionsSpec withSpatialDimensions(List<SpatialDimensionSchema> spatials)
   {
-    return new DimensionsSpec(dimensions, ImmutableList.copyOf(dimensionExclusions), spatials);
+    return new DimensionsSpec(dimensions, floatDimensions, ImmutableList.copyOf(dimensionExclusions), spatials);
   }
 
   private void verify()
