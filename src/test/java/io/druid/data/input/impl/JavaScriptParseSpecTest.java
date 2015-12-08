@@ -38,7 +38,7 @@ public class JavaScriptParseSpecTest
   {
     JavaScriptParseSpec spec = new JavaScriptParseSpec(
         new TimestampSpec("abc", "iso", null),
-        new DimensionsSpec(Arrays.asList("abc"), null, null),
+        new DimensionsSpec(Arrays.asList("abc"), null, null, null),
         "abc"
     );
     final JavaScriptParseSpec serde = jsonMapper.readValue(

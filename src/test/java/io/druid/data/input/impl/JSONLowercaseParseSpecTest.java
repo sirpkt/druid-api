@@ -42,6 +42,7 @@ public class JSONLowercaseParseSpecTest
         new DimensionsSpec(
             Arrays.asList("A", "B"),
             Lists.<String>newArrayList(),
+            Lists.<String>newArrayList(),
             Lists.<SpatialDimensionSchema>newArrayList()
         )
     );

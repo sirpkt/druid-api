@@ -38,7 +38,7 @@ public class DelimitedParseSpecTest
   {
     DelimitedParseSpec spec = new DelimitedParseSpec(
         new TimestampSpec("abc", "iso", null),
-        new DimensionsSpec(Arrays.asList("abc"), null, null),
+        new DimensionsSpec(Arrays.asList("abc"), null, null, null),
         "\u0001",
         "\u0002",
         Arrays.asList("abc")
@@ -68,6 +68,7 @@ public class DelimitedParseSpecTest
         new DimensionsSpec(
             Arrays.asList("a", "b"),
             Lists.<String>newArrayList(),
+            Lists.<String>newArrayList(),
             Lists.<SpatialDimensionSchema>newArrayList()
         ),
         ",",
@@ -88,6 +89,7 @@ public class DelimitedParseSpecTest
         new DimensionsSpec(
             Arrays.asList("a,", "b"),
             Lists.<String>newArrayList(),
+            Lists.<String>newArrayList(),
             Lists.<SpatialDimensionSchema>newArrayList()
         ),
         ",",
@@ -106,6 +108,7 @@ public class DelimitedParseSpecTest
         ),
         new DimensionsSpec(
             Arrays.asList("a", "b"),
+            Lists.<String>newArrayList(),
             Lists.<String>newArrayList(),
             Lists.<SpatialDimensionSchema>newArrayList()
         ),

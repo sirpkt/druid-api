@@ -38,7 +38,7 @@ public class RegexParseSpecTest
   {
     RegexParseSpec spec = new RegexParseSpec(
         new TimestampSpec("abc", "iso", null),
-        new DimensionsSpec(Arrays.asList("abc"), null, null),
+        new DimensionsSpec(Arrays.asList("abc"), null, null, null),
         "\u0001",
         "abc"
     );

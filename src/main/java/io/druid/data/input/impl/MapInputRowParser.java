@@ -75,7 +75,7 @@ public class MapInputRowParser implements InputRowParser<Map<String, Object>>
       throw new ParseException(e, "Unparseable timestamp found!");
     }
 
-    return new MapBasedInputRow(timestamp.getMillis(), dimensions, theMap);
+    return new MapBasedInputRow(timestamp.getMillis(), dimensions, floatDimensions, theMap);
   }
 
   @JsonProperty

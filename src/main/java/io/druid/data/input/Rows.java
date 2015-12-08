@@ -21,6 +21,7 @@ package io.druid.data.input;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.metamx.common.ISE;
 
@@ -33,7 +34,7 @@ import java.util.TreeMap;
  */
 public class Rows
 {
-  public static InputRow toCaseInsensitiveInputRow(final Row row, final List<String> dimensions)
+  public static InputRow toCaseInsensitiveInputRow(final Row row, final List<String> dimensions, final List<String> floatDimensions)
   {
     if (row instanceof MapBasedRow) {
       MapBasedRow mapBasedRow = (MapBasedRow) row;
@@ -43,6 +44,7 @@ public class Rows
       return new MapBasedInputRow(
           mapBasedRow.getTimestamp(),
           dimensions,
+          floatDimensions,
           caseInsensitiveMap
       );
     }

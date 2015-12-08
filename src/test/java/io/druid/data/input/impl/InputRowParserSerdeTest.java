@@ -46,7 +46,7 @@ public class InputRowParserSerdeTest
     final StringInputRowParser parser = new StringInputRowParser(
         new JSONParseSpec(
             new TimestampSpec("timestamp", "iso", null),
-            new DimensionsSpec(ImmutableList.of("foo", "bar"), null, null),
+            new DimensionsSpec(ImmutableList.of("foo", "bar"), null, null, null),
             null,
             null
         )
@@ -89,7 +89,7 @@ public class InputRowParserSerdeTest
     final MapInputRowParser parser = new MapInputRowParser(
         new JSONParseSpec(
             new TimestampSpec("timeposix", "posix", null),
-            new DimensionsSpec(ImmutableList.of("foo", "bar"), ImmutableList.of("baz"), null),
+            new DimensionsSpec(ImmutableList.of("foo", "bar"), null, ImmutableList.of("baz"), null),
             null,
             null
         )
@@ -118,7 +118,7 @@ public class InputRowParserSerdeTest
     final MapInputRowParser parser = new MapInputRowParser(
         new JSONParseSpec(
             new TimestampSpec("timemillis", "millis", null),
-            new DimensionsSpec(ImmutableList.of("foo", "values"), ImmutableList.of("toobig", "value"), null),
+            new DimensionsSpec(ImmutableList.of("foo", "values"), null, ImmutableList.of("toobig", "value"), null),
             null,
             null
         )
@@ -150,12 +150,49 @@ public class InputRowParserSerdeTest
     Assert.assertEquals(1412705931123L, parsed.getTimestampFromEpoch());
   }
 
+  @Test
+  public void testMapInputRowParserFloatDimSerde() throws Exception
+  {
+    final MapInputRowParser parser = new MapInputRowParser(
+        new JSONParseSpec(
+            new TimestampSpec("timemillis", "millis", null),
+            new DimensionsSpec(ImmutableList.of("foo", "values"), ImmutableList.of("toobig", "value"), null, null),
+            null,
+            null
+        )
+    );
+    final MapInputRowParser parser2 = jsonMapper.readValue(
+        jsonMapper.writeValueAsBytes(parser),
+        MapInputRowParser.class
+    );
+    final InputRow parsed = parser2.parse(
+        ImmutableMap.<String, Object>of(
+            "timemillis", 1412705931123L,
+            "toobig", 123E14,
+            "value", 123.456,
+            "long", 123456789000L,
+            "values", Lists.newArrayList(1412705931123L, 123.456, 123E45, "hello")
+        )
+    );
+    Assert.assertEquals(ImmutableList.of("foo", "values", "toobig", "value"), parsed.getDimensions());
+    Assert.assertEquals(ImmutableList.of(), parsed.getDimension("foo"));
+    Assert.assertEquals(
+        ImmutableList.of("1412705931123", "123.456", "1.23E47", "hello"),
+        parsed.getDimension("values")
+    );
+    Assert.assertEquals(123E14f, parsed.getFloatDimension("toobig").get(0), 0f);
+    Assert.assertEquals(123.456f, parsed.getFloatDimension("value").get(0), 0f);
+    Assert.assertEquals(123456789000L, parsed.getRaw("long"));
+    Assert.assertEquals(1.23456791E11f, parsed.getFloatMetric("long"));
+    Assert.assertEquals(1412705931123L, parsed.getTimestampFromEpoch());
+  }
+
   private InputRow testCharsetParseHelper(Charset charset) throws Exception
   {
     final StringInputRowParser parser = new StringInputRowParser(
         new JSONParseSpec(
             new TimestampSpec("timestamp", "iso", null),
-            new DimensionsSpec(ImmutableList.of("foo", "bar"), null, null),
+            new DimensionsSpec(ImmutableList.of("foo", "bar"), null, null, null),
             null,
             null
         ),
@@ -194,7 +231,7 @@ public class InputRowParserSerdeTest
     final StringInputRowParser parser = new StringInputRowParser(
         new JSONParseSpec(
             new TimestampSpec("timestamp", "iso", null),
-            new DimensionsSpec(null, null, null),
+            new DimensionsSpec(null, null, null, null),
             flattenSpec,
             null
         )

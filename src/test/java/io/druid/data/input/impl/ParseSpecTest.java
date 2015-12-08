@@ -39,6 +39,7 @@ public class ParseSpecTest
         new DimensionsSpec(
             Arrays.asList("a", "b", "a"),
             Lists.<String>newArrayList(),
+            Lists.<String>newArrayList(),
             Lists.<SpatialDimensionSchema>newArrayList()
         ),
         ",",
@@ -58,6 +59,7 @@ public class ParseSpecTest
         ),
         new DimensionsSpec(
             Arrays.asList("a", "B"),
+            Lists.<String>newArrayList(),
             Lists.newArrayList("B"),
             Lists.<SpatialDimensionSchema>newArrayList()
         ),
@@ -78,6 +80,7 @@ public class ParseSpecTest
         ),
         new DimensionsSpec(
             Arrays.asList("a"),
+            Lists.<String>newArrayList(),
             Lists.newArrayList("B", "B"),
             Lists.<SpatialDimensionSchema>newArrayList()
         ),

@@ -64,7 +64,7 @@ public class NoopInputRowParserTest
         new NoopInputRowParser(
             new TimeAndDimsParseSpec(
                 null,
-                new DimensionsSpec(ImmutableList.of("host"), null, null)
+                new DimensionsSpec(ImmutableList.of("host"), null, null, null)
             )
         ),
         actual
