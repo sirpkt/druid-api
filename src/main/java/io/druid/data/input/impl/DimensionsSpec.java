@@ -76,6 +76,9 @@ public class DimensionsSpec
   }
 
   @JsonProperty
+  public List<String> getFloatDimensions() { return floatDimensions; }
+
+  @JsonProperty
   public Set<String> getDimensionExclusions()
   {
     return dimensionExclusions;
@@ -89,7 +92,8 @@ public class DimensionsSpec
 
   public boolean hasCustomDimensions()
   {
-    return !(dimensions == null || dimensions.isEmpty());
+    return (!(dimensions == null || dimensions.isEmpty())) ||
+            (!(floatDimensions == null || floatDimensions.isEmpty()));
   }
 
   public DimensionsSpec withDimensions(List<String> dims)
@@ -125,6 +129,7 @@ public class DimensionsSpec
     );
 
     ParserUtils.validateFields(dimensions);
+    ParserUtils.validateFields(floatDimensions);
     ParserUtils.validateFields(dimensionExclusions);
     ParserUtils.validateFields(
         Iterables.transform(
@@ -156,6 +161,9 @@ public class DimensionsSpec
     if (!dimensions.equals(that.dimensions)) {
       return false;
     }
+    if (!floatDimensions.equals(that.floatDimensions)) {
+      return false;
+    }
     if (!dimensionExclusions.equals(that.dimensionExclusions)) {
       return false;
     }
@@ -167,6 +175,7 @@ public class DimensionsSpec
   public int hashCode()
   {
     int result = dimensions.hashCode();
+    result = 31 * result + floatDimensions.hashCode();
     result = 31 * result + dimensionExclusions.hashCode();
     result = 31 * result + spatialDimensions.hashCode();
     return result;

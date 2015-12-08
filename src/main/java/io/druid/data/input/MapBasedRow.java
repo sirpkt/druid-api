@@ -47,6 +47,14 @@ public class MapBasedRow implements Row
     }
   };
 
+  private static final Function<Object, Float> TO_FLOAT = new Function<Object, Float>() {
+    @Override
+    public Float apply(final Object o)
+    {
+      return Float.valueOf(String.valueOf(o));
+    }
+  };
+
   private final DateTime timestamp;
   private final Map<String, Object> event;
 
@@ -102,6 +110,23 @@ public class MapBasedRow implements Row
           TO_STRING_INCLUDING_NULL);
     } else {
       return Collections.singletonList(String.valueOf(dimValue));
+    }
+  }
+
+  @Override
+  public List<Float> getFloatDimension(String dimension)
+  {
+    final Object floatDimValue = event.get(dimension);
+
+    if (floatDimValue == null) {
+      return Collections.emptyList();
+    } else if (floatDimValue instanceof List) {
+      return Lists.transform(
+          (List) floatDimValue,
+          TO_FLOAT
+      );
+    } else {
+      return Collections.singletonList(Float.valueOf(String.valueOf(floatDimValue)));
     }
   }
 

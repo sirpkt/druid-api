@@ -54,6 +54,9 @@ public class MapInputRowParser implements InputRowParser<Map<String, Object>>
                                                      .getDimensionExclusions()
                                         )
                                     );
+    final List<String> floatDimensions = parseSpec.getDimensionsSpec().hasCustomDimensions()
+                                         ? parseSpec.getDimensionsSpec().getFloatDimensions()
+                                         : Lists.<String>newArrayList();
 
     final DateTime timestamp;
     try {

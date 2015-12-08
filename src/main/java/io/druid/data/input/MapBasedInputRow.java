@@ -29,25 +29,30 @@ import java.util.Map;
 public class MapBasedInputRow extends MapBasedRow implements InputRow
 {
   private final List<String> dimensions;
+  private final List<String> floatDimensions;
 
   public MapBasedInputRow(
       long timestamp,
       List<String> dimensions,
+      List<String> floatDimensions,
       Map<String, Object> event
   )
   {
     super(timestamp, event);
     this.dimensions = dimensions;
+    this.floatDimensions = floatDimensions;
   }
 
   public MapBasedInputRow(
       DateTime timestamp,
       List<String> dimensions,
+      List<String> floatDimensions,
       Map<String, Object> event
   )
   {
     super(timestamp, event);
     this.dimensions = dimensions;
+    this.floatDimensions = floatDimensions;
   }
 
   @Override

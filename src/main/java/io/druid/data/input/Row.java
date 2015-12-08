@@ -63,6 +63,16 @@ public interface Row extends Comparable<Row>
   public List<String> getDimension(String dimension);
 
   /**
+   * Returns the list of float dimension values for the given column name.
+   * <p/>
+   *
+   * @param floatDimension the column name of the flaot dimension requested
+   *
+   * @return the list of values for the provided column name
+   */
+  public List<Float> getFloatDimension(String floatDimension);
+
+  /**
    * Returns the raw dimension value for the given column name. This is different from #getDimension which
    * all values to strings before returning them.
    *
