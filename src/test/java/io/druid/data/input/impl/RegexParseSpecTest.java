@@ -38,7 +38,7 @@ public class RegexParseSpecTest
   {
     RegexParseSpec spec = new RegexParseSpec(
         new TimestampSpec("abc", "iso", null),
-        new DimensionsSpec(Arrays.asList("abc"), null, null, null),
+        new DimensionsSpec(Arrays.asList(new DimensionSchema("abc", "String")), null, null),
         "\u0001",
         "abc"
     );
@@ -51,6 +51,6 @@ public class RegexParseSpecTest
 
     Assert.assertEquals("abc", serde.getPattern());
     Assert.assertEquals("\u0001", serde.getListDelimiter());
-    Assert.assertEquals(Arrays.asList("abc"), serde.getDimensionsSpec().getDimensions());
+    Assert.assertEquals(Arrays.asList(new DimensionSchema("abc", "String")), serde.getDimensionsSpec().getDimensions());
   }
 }

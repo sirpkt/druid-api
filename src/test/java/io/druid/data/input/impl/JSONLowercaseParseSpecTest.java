@@ -40,8 +40,7 @@ public class JSONLowercaseParseSpecTest
             null
         ),
         new DimensionsSpec(
-            Arrays.asList("A", "B"),
-            Lists.<String>newArrayList(),
+            Arrays.asList(new DimensionSchema("A", "String"), new DimensionSchema("B", "String")),
             Lists.<String>newArrayList(),
             Lists.<SpatialDimensionSchema>newArrayList()
         )

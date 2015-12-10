@@ -19,6 +19,7 @@ package io.druid.data.input.impl;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.metamx.common.logger.Logger;
@@ -45,18 +46,22 @@ public class MapInputRowParser implements InputRowParser<Map<String, Object>>
   @Override
   public InputRow parse(Map<String, Object> theMap)
   {
-    final List<String> dimensions = parseSpec.getDimensionsSpec().hasCustomDimensions()
+    final List<DimensionSchema> dimensions = parseSpec.getDimensionsSpec().hasCustomDimensions()
                                     ? parseSpec.getDimensionsSpec().getDimensions()
-                                    : Lists.newArrayList(
-                                        Sets.difference(
-                                            theMap.keySet(),
-                                            parseSpec.getDimensionsSpec()
-                                                     .getDimensionExclusions()
-                                        )
-                                    );
-    final List<String> floatDimensions = parseSpec.getDimensionsSpec().hasCustomDimensions()
-                                         ? parseSpec.getDimensionsSpec().getFloatDimensions()
-                                         : Lists.<String>newArrayList();
+                                    : Lists.transform(
+        Lists.newArrayList(Sets.difference(
+            theMap.keySet(),
+            parseSpec.getDimensionsSpec()
+                .getDimensionExclusions()
+        )),
+        new Function<String, DimensionSchema>() {
+          @Override
+          public DimensionSchema apply(String name)
+          {
+            return new DimensionSchema(name, "String");
+          }
+        }
+    );
 
     final DateTime timestamp;
     try {
@@ -75,7 +80,7 @@ public class MapInputRowParser implements InputRowParser<Map<String, Object>>
       throw new ParseException(e, "Unparseable timestamp found!");
     }
 
-    return new MapBasedInputRow(timestamp.getMillis(), dimensions, floatDimensions, theMap);
+    return new MapBasedInputRow(timestamp.getMillis(), dimensions, theMap);
   }
 
   @JsonProperty

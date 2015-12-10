@@ -31,6 +31,7 @@ import junit.framework.Assert;
 import org.joda.time.DateTime;
 import org.junit.Test;
 
+import java.awt.*;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -46,7 +47,7 @@ public class InputRowParserSerdeTest
     final StringInputRowParser parser = new StringInputRowParser(
         new JSONParseSpec(
             new TimestampSpec("timestamp", "iso", null),
-            new DimensionsSpec(ImmutableList.of("foo", "bar"), null, null, null),
+            new DimensionsSpec(ImmutableList.of(new DimensionSchema("foo", "String"), new DimensionSchema("bar", "String")), null, null),
             null,
             null
         )
@@ -60,7 +61,8 @@ public class InputRowParserSerdeTest
             "{\"foo\":\"x\",\"bar\":\"y\",\"qux\":\"z\",\"timestamp\":\"2000\"}".getBytes(Charsets.UTF_8)
         )
     );
-    Assert.assertEquals(ImmutableList.of("bar", "foo"), parsed.getDimensions());
+    Assert.assertEquals(ImmutableList.of(new DimensionSchema("bar", "String"), new DimensionSchema("foo", "String")),
+        parsed.getDimensions());
     Assert.assertEquals(ImmutableList.of("x"), parsed.getDimension("foo"));
     Assert.assertEquals(ImmutableList.of("y"), parsed.getDimension("bar"));
     Assert.assertEquals(new DateTime("2000").getMillis(), parsed.getTimestampFromEpoch());
@@ -76,7 +78,8 @@ public class InputRowParserSerdeTest
 
     for (Charset testCharset : testCharsets) {
       InputRow parsed = testCharsetParseHelper(testCharset);
-      Assert.assertEquals(ImmutableList.of("bar", "foo"), parsed.getDimensions());
+      Assert.assertEquals(ImmutableList.of(new DimensionSchema("bar", "String"), new DimensionSchema("foo", "String")),
+          parsed.getDimensions());
       Assert.assertEquals(ImmutableList.of("x"), parsed.getDimension("foo"));
       Assert.assertEquals(ImmutableList.of("y"), parsed.getDimension("bar"));
       Assert.assertEquals(new DateTime("3000").getMillis(), parsed.getTimestampFromEpoch());
@@ -89,7 +92,10 @@ public class InputRowParserSerdeTest
     final MapInputRowParser parser = new MapInputRowParser(
         new JSONParseSpec(
             new TimestampSpec("timeposix", "posix", null),
-            new DimensionsSpec(ImmutableList.of("foo", "bar"), null, ImmutableList.of("baz"), null),
+            new DimensionsSpec(
+                ImmutableList.of(new DimensionSchema("foo", "String"), new DimensionSchema("bar", "String")),
+                ImmutableList.of("baz"),
+                null),
             null,
             null
         )
@@ -106,7 +112,8 @@ public class InputRowParserSerdeTest
             "timeposix", "1"
         )
     );
-    Assert.assertEquals(ImmutableList.of("bar", "foo"), parsed.getDimensions());
+    Assert.assertEquals(ImmutableList.of(new DimensionSchema("bar", "String"), new DimensionSchema("foo", "String")),
+        parsed.getDimensions());
     Assert.assertEquals(ImmutableList.of("x"), parsed.getDimension("foo"));
     Assert.assertEquals(ImmutableList.of("y"), parsed.getDimension("bar"));
     Assert.assertEquals(1000, parsed.getTimestampFromEpoch());
@@ -118,7 +125,9 @@ public class InputRowParserSerdeTest
     final MapInputRowParser parser = new MapInputRowParser(
         new JSONParseSpec(
             new TimestampSpec("timemillis", "millis", null),
-            new DimensionsSpec(ImmutableList.of("foo", "values"), null, ImmutableList.of("toobig", "value"), null),
+            new DimensionsSpec(
+                ImmutableList.of(new DimensionSchema("foo", "String"), new DimensionSchema("values", "String")),
+                ImmutableList.of("toobig", "value"), null),
             null,
             null
         )
@@ -136,10 +145,11 @@ public class InputRowParserSerdeTest
             "values", Lists.newArrayList(1412705931123L, 123.456, 123E45, "hello")
         )
     );
-    Assert.assertEquals(ImmutableList.of("foo", "values"), parsed.getDimensions());
+    Assert.assertEquals(ImmutableList.of(new DimensionSchema("foo", "String"), new DimensionSchema("values", "String")),
+        parsed.getDimensions());
     Assert.assertEquals(ImmutableList.of(), parsed.getDimension("foo"));
     Assert.assertEquals(
-        ImmutableList.of("1412705931123", "123.456", "1.23E47", "hello"),
+        ImmutableList.of(1412705931123L, 123.456, 1.23E47, "hello"),
         parsed.getDimension("values")
     );
     Assert.assertEquals(Float.POSITIVE_INFINITY, parsed.getFloatMetric("toobig"));
@@ -156,7 +166,10 @@ public class InputRowParserSerdeTest
     final MapInputRowParser parser = new MapInputRowParser(
         new JSONParseSpec(
             new TimestampSpec("timemillis", "millis", null),
-            new DimensionsSpec(ImmutableList.of("foo", "values"), ImmutableList.of("toobig", "value"), null, null),
+            new DimensionsSpec(ImmutableList.of(new DimensionSchema("foo", "String"),
+                new DimensionSchema("values", "String"),
+                new DimensionSchema("toobig", "Float"),
+                new DimensionSchema("value", "Float")), null, null),
             null,
             null
         )
@@ -174,14 +187,16 @@ public class InputRowParserSerdeTest
             "values", Lists.newArrayList(1412705931123L, 123.456, 123E45, "hello")
         )
     );
-    Assert.assertEquals(ImmutableList.of("foo", "values", "toobig", "value"), parsed.getDimensions());
+    Assert.assertEquals(ImmutableList.of(new DimensionSchema("foo", "String"),
+        new DimensionSchema("toobig", "Float"),
+        new DimensionSchema("value", "Float"),
+        new DimensionSchema("values", "String")),
+        parsed.getDimensions());
     Assert.assertEquals(ImmutableList.of(), parsed.getDimension("foo"));
     Assert.assertEquals(
-        ImmutableList.of("1412705931123", "123.456", "1.23E47", "hello"),
+        ImmutableList.of(1412705931123L, 123.456, 1.23E47, "hello"),
         parsed.getDimension("values")
     );
-    Assert.assertEquals(123E14f, parsed.getFloatDimension("toobig").get(0), 0f);
-    Assert.assertEquals(123.456f, parsed.getFloatDimension("value").get(0), 0f);
     Assert.assertEquals(123456789000L, parsed.getRaw("long"));
     Assert.assertEquals(1.23456791E11f, parsed.getFloatMetric("long"));
     Assert.assertEquals(1412705931123L, parsed.getTimestampFromEpoch());
@@ -192,7 +207,7 @@ public class InputRowParserSerdeTest
     final StringInputRowParser parser = new StringInputRowParser(
         new JSONParseSpec(
             new TimestampSpec("timestamp", "iso", null),
-            new DimensionsSpec(ImmutableList.of("foo", "bar"), null, null, null),
+            new DimensionsSpec(ImmutableList.of(new DimensionSchema("foo", "String"), new DimensionSchema("bar", "String")), null, null),
             null,
             null
         ),
@@ -231,7 +246,7 @@ public class InputRowParserSerdeTest
     final StringInputRowParser parser = new StringInputRowParser(
         new JSONParseSpec(
             new TimestampSpec("timestamp", "iso", null),
-            new DimensionsSpec(null, null, null, null),
+            new DimensionsSpec(null, null, null),
             flattenSpec,
             null
         )
@@ -245,16 +260,22 @@ public class InputRowParserSerdeTest
     final InputRow parsed = parser2.parse(
         "{\"blah\":[4,5,6], \"newmet\":5, \"foo\":{\"bar1\":\"aaa\", \"bar2\":\"bbb\"}, \"baz\":[1,2,3], \"timestamp\":\"2999\", \"foo.bar1\":\"Hello world!\", \"hey\":[{\"barx\":\"asdf\"}], \"met\":{\"a\":456}}"
     );
-    Assert.assertEquals(ImmutableList.of("foobar1", "foobar2", "baz0", "baz1", "baz2", "hey0barx", "metA", "timestamp", "foo.bar1", "blah", "newmet", "baz"), parsed.getDimensions());
+    Assert.assertEquals(ImmutableList.of(
+        new DimensionSchema("foobar1", "String"), new DimensionSchema("foobar2", "String"),
+        new DimensionSchema("baz0", "String"), new DimensionSchema("baz1", "String"),
+        new DimensionSchema("baz2", "String"), new DimensionSchema("hey0barx", "String"),
+        new DimensionSchema("metA", "String"), new DimensionSchema("timestamp", "String"),
+        new DimensionSchema("foo.bar1", "String"), new DimensionSchema("blah", "String"),
+        new DimensionSchema("newmet", "String"), new DimensionSchema("baz", "String")), parsed.getDimensions());
     Assert.assertEquals(ImmutableList.of("aaa"), parsed.getDimension("foobar1"));
     Assert.assertEquals(ImmutableList.of("bbb"), parsed.getDimension("foobar2"));
-    Assert.assertEquals(ImmutableList.of("1"), parsed.getDimension("baz0"));
-    Assert.assertEquals(ImmutableList.of("2"), parsed.getDimension("baz1"));
-    Assert.assertEquals(ImmutableList.of("3"), parsed.getDimension("baz2"));
+    Assert.assertEquals(ImmutableList.of(1L), parsed.getDimension("baz0"));
+    Assert.assertEquals(ImmutableList.of(2L), parsed.getDimension("baz1"));
+    Assert.assertEquals(ImmutableList.of(3L), parsed.getDimension("baz2"));
     Assert.assertEquals(ImmutableList.of("Hello world!"), parsed.getDimension("foo.bar1"));
     Assert.assertEquals(ImmutableList.of("asdf"), parsed.getDimension("hey0barx"));
-    Assert.assertEquals(ImmutableList.of("456"), parsed.getDimension("metA"));
-    Assert.assertEquals(ImmutableList.of("5"), parsed.getDimension("newmet"));
+    Assert.assertEquals(ImmutableList.of(456L), parsed.getDimension("metA"));
+    Assert.assertEquals(ImmutableList.of(5L), parsed.getDimension("newmet"));
     Assert.assertEquals(new DateTime("2999").getMillis(), parsed.getTimestampFromEpoch());
 
     String testSpec = "{\"enabled\": true,\"useFieldDiscovery\": true, \"fields\": [\"parseThisRootField\"]}";

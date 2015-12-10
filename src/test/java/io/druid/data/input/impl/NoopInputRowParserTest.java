@@ -50,7 +50,8 @@ public class NoopInputRowParserTest
   {
     String jsonStr = "{"
                      + "\"type\":\"noop\","
-                     + "\"parseSpec\":{ \"format\":\"timeAndDims\", \"dimensionsSpec\": { \"dimensions\": [\"host\"] } }"
+                     + "\"parseSpec\":{ \"format\":\"timeAndDims\", "
+                     + "\"dimensionsSpec\": { \"dimensions\": [ { \"name\": \"host\", \"type\": \"String\" } ] } }"
                      + "}";
 
     InputRowParser actual = mapper.readValue(
@@ -64,7 +65,7 @@ public class NoopInputRowParserTest
         new NoopInputRowParser(
             new TimeAndDimsParseSpec(
                 null,
-                new DimensionsSpec(ImmutableList.of("host"), null, null, null)
+                new DimensionsSpec(ImmutableList.of(new DimensionSchema("host", "String")), null, null)
             )
         ),
         actual

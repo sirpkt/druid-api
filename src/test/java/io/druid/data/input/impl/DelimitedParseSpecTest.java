@@ -38,7 +38,7 @@ public class DelimitedParseSpecTest
   {
     DelimitedParseSpec spec = new DelimitedParseSpec(
         new TimestampSpec("abc", "iso", null),
-        new DimensionsSpec(Arrays.asList("abc"), null, null, null),
+        new DimensionsSpec(Arrays.asList(new DimensionSchema("abc", "String")), null, null),
         "\u0001",
         "\u0002",
         Arrays.asList("abc")
@@ -53,7 +53,7 @@ public class DelimitedParseSpecTest
     Assert.assertEquals(Arrays.asList("abc"), serde.getColumns());
     Assert.assertEquals("\u0001", serde.getDelimiter());
     Assert.assertEquals("\u0002", serde.getListDelimiter());
-    Assert.assertEquals(Arrays.asList("abc"), serde.getDimensionsSpec().getDimensions());
+    Assert.assertEquals(Arrays.asList(new DimensionSchema("abc", "String")), serde.getDimensionsSpec().getDimensions());
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -66,8 +66,7 @@ public class DelimitedParseSpecTest
             null
         ),
         new DimensionsSpec(
-            Arrays.asList("a", "b"),
-            Lists.<String>newArrayList(),
+            Arrays.asList(new DimensionSchema("a", "String"), new DimensionSchema("b", "String")),
             Lists.<String>newArrayList(),
             Lists.<SpatialDimensionSchema>newArrayList()
         ),
@@ -87,8 +86,7 @@ public class DelimitedParseSpecTest
             null
         ),
         new DimensionsSpec(
-            Arrays.asList("a,", "b"),
-            Lists.<String>newArrayList(),
+            Arrays.asList(new DimensionSchema("a", "String"), new DimensionSchema("b", "String")),
             Lists.<String>newArrayList(),
             Lists.<SpatialDimensionSchema>newArrayList()
         ),
@@ -107,8 +105,7 @@ public class DelimitedParseSpecTest
             null
         ),
         new DimensionsSpec(
-            Arrays.asList("a", "b"),
-            Lists.<String>newArrayList(),
+            Arrays.asList(new DimensionSchema("a", "String"), new DimensionSchema("b", "String")),
             Lists.<String>newArrayList(),
             Lists.<SpatialDimensionSchema>newArrayList()
         ),

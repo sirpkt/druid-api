@@ -51,7 +51,7 @@ public class JavaScriptParseSpec extends ParseSpec
   }
 
   @Override
-  public void verify(List<String> usedCols)
+  public void verify(List<DimensionSchema> usedCols)
   {
   }
 

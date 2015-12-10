@@ -53,7 +53,6 @@ public class CSVParseSpec extends ParseSpec
     this.columns = columns;
 
     verify(dimensionsSpec.getDimensions());
-    verify(dimensionsSpec.getFloatDimensions());
   }
 
   @JsonProperty
@@ -69,10 +68,13 @@ public class CSVParseSpec extends ParseSpec
   }
 
   @Override
-  public void verify(List<String> usedCols)
+  public void verify(List<DimensionSchema> usedCols)
   {
-    for (String columnName : usedCols) {
+    for (DimensionSchema columnSchema : usedCols) {
+      String columnName = columnSchema.getName();
+      String columnType = columnSchema.getType();
       Preconditions.checkArgument(columns.contains(columnName), "column[%s] not in columns.", columnName);
+      Preconditions.checkArgument(DimensionType.isValid(columnType), "type[%s] not supported yet.", columnType);
     }
   }
 

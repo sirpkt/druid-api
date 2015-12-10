@@ -52,27 +52,4 @@ public class MapBasedRowTest
     Assert.assertEquals(-9223372036854775807L, row.getLongMetric("k5"));
     Assert.assertEquals(9223372036854775802L, row.getLongMetric("k6"));
   }
-
-  @Test
-  public void testGetFloatDimFromString()
-  {
-    MapBasedRow row = new MapBasedRow(
-        new DateTime(),
-        ImmutableMap.<String,Object>builder()
-            .put("k0", "-1.2")
-            .put("k1", "1.23")
-            .put("k2", "1.8")
-            .put("k3", "1e5")
-            .put("k4", "9223372036854775806")
-            .put("k5", "-9223372036854775807")
-            .put("k6", "+9223372036854775802")
-            .build()
-    );
-
-    Assert.assertArrayEquals(new Float[] {-1.2f}, row.getFloatDimension("k0").toArray());
-    Assert.assertArrayEquals(new Float[] {1.23f}, row.getFloatDimension("k1").toArray());
-    Assert.assertArrayEquals(new Float[] {1.8f}, row.getFloatDimension("k2").toArray());
-    Assert.assertArrayEquals(new Float[] {1e5f}, row.getFloatDimension("k3").toArray());
-    Assert.assertArrayEquals(new Float[] {9223372036854775806f}, row.getFloatDimension("k4").toArray());
-  }
 }

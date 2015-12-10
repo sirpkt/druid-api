@@ -28,35 +28,43 @@ import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.metamx.common.parsers.ParserUtils;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
 public class DimensionsSpec
 {
-  private final List<String> dimensions;
-  private final List<String> floatDimensions;
+  private final List<DimensionSchema> dimensions;
   private final Set<String> dimensionExclusions;
   private final List<SpatialDimensionSchema> spatialDimensions;
 
+  private final Function<DimensionSchema, String> DIMSCHEMA_TO_STRING = new Function<DimensionSchema, String>() {
+    @Override
+    public String apply(@Nullable DimensionSchema dimensionSchema) {
+      return dimensionSchema.getName();
+    }
+  };
+
   @JsonCreator
   public DimensionsSpec(
-      @JsonProperty("dimensions") List<String> dimensions,
-      @JsonProperty("floatDimensions") List<String> floatDimensions,
+      @JsonProperty("dimensions") List<DimensionSchema> dimensions,
       @JsonProperty("dimensionExclusions") List<String> dimensionExclusions,
       @JsonProperty("spatialDimensions") List<SpatialDimensionSchema> spatialDimensions
   )
   {
     this.dimensions = dimensions == null
-                      ? Lists.<String>newArrayList()
+                      ? Lists.<DimensionSchema>newArrayList()
                       : Lists.newArrayList(dimensions);
 
-    this.floatDimensions = floatDimensions == null
-                           ? Lists.<String>newArrayList()
-                           : Lists.<String>newArrayList(floatDimensions);
-
     // Small work around for https://github.com/metamx/druid/issues/658
-    Collections.sort(this.dimensions, Ordering.natural().nullsFirst());
+    Collections.sort(this.dimensions, Ordering.from(new Comparator<DimensionSchema>() {
+      @Override
+      public int compare(DimensionSchema o1, DimensionSchema o2) {
+        return o1.getName().compareTo(o2.getName());
+      }
+    }).nullsFirst());
 
     this.dimensionExclusions = (dimensionExclusions == null)
                                ? Sets.<String>newHashSet()
@@ -70,13 +78,10 @@ public class DimensionsSpec
   }
 
   @JsonProperty
-  public List<String> getDimensions()
+  public List<DimensionSchema> getDimensions()
   {
     return dimensions;
   }
-
-  @JsonProperty
-  public List<String> getFloatDimensions() { return floatDimensions; }
 
   @JsonProperty
   public Set<String> getDimensionExclusions()
@@ -92,25 +97,18 @@ public class DimensionsSpec
 
   public boolean hasCustomDimensions()
   {
-    return (!(dimensions == null || dimensions.isEmpty())) ||
-            (!(floatDimensions == null || floatDimensions.isEmpty()));
+    return !(dimensions == null || dimensions.isEmpty());
   }
 
-  public DimensionsSpec withDimensions(List<String> dims)
+  public DimensionsSpec withDimensions(List<DimensionSchema> dims)
   {
-    return new DimensionsSpec(dims, floatDimensions, ImmutableList.copyOf(dimensionExclusions), spatialDimensions);
-  }
-
-  public DimensionsSpec withFloatDimensions(List<String> floatDims)
-  {
-    return new DimensionsSpec(dimensions, floatDims, ImmutableList.copyOf(dimensionExclusions), spatialDimensions);
+    return new DimensionsSpec(dims, ImmutableList.copyOf(dimensionExclusions), spatialDimensions);
   }
 
   public DimensionsSpec withDimensionExclusions(Set<String> dimExs)
   {
     return new DimensionsSpec(
         dimensions,
-        floatDimensions,
         ImmutableList.copyOf(Sets.union(dimensionExclusions, dimExs)),
         spatialDimensions
     );
@@ -118,18 +116,20 @@ public class DimensionsSpec
 
   public DimensionsSpec withSpatialDimensions(List<SpatialDimensionSchema> spatials)
   {
-    return new DimensionsSpec(dimensions, floatDimensions, ImmutableList.copyOf(dimensionExclusions), spatials);
+    return new DimensionsSpec(dimensions, ImmutableList.copyOf(dimensionExclusions), spatials);
   }
 
   private void verify()
   {
     Preconditions.checkArgument(
-        Sets.intersection(this.dimensionExclusions, Sets.newHashSet(this.dimensions)).isEmpty(),
+        Sets.intersection(dimensionExclusions,
+            Sets.newHashSet(Iterables.transform(dimensions, DIMSCHEMA_TO_STRING))
+        ).isEmpty(),
         "dimensions and dimensions exclusions cannot overlap"
     );
 
-    ParserUtils.validateFields(dimensions);
-    ParserUtils.validateFields(floatDimensions);
+    ParserUtils.validateFields(Iterables.transform(dimensions, DIMSCHEMA_TO_STRING)
+    );
     ParserUtils.validateFields(dimensionExclusions);
     ParserUtils.validateFields(
         Iterables.transform(
@@ -161,9 +161,6 @@ public class DimensionsSpec
     if (!dimensions.equals(that.dimensions)) {
       return false;
     }
-    if (!floatDimensions.equals(that.floatDimensions)) {
-      return false;
-    }
     if (!dimensionExclusions.equals(that.dimensionExclusions)) {
       return false;
     }
@@ -175,7 +172,6 @@ public class DimensionsSpec
   public int hashCode()
   {
     int result = dimensions.hashCode();
-    result = 31 * result + floatDimensions.hashCode();
     result = 31 * result + dimensionExclusions.hashCode();
     result = 31 * result + spatialDimensions.hashCode();
     return result;

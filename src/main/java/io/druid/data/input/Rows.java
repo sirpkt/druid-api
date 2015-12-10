@@ -24,6 +24,7 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.metamx.common.ISE;
+import io.druid.data.input.impl.DimensionSchema;
 
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,7 @@ import java.util.TreeMap;
  */
 public class Rows
 {
-  public static InputRow toCaseInsensitiveInputRow(final Row row, final List<String> dimensions, final List<String> floatDimensions)
+  public static InputRow toCaseInsensitiveInputRow(final Row row, final List<DimensionSchema> dimensions)
   {
     if (row instanceof MapBasedRow) {
       MapBasedRow mapBasedRow = (MapBasedRow) row;
@@ -44,7 +45,6 @@ public class Rows
       return new MapBasedInputRow(
           mapBasedRow.getTimestamp(),
           dimensions,
-          floatDimensions,
           caseInsensitiveMap
       );
     }
@@ -58,11 +58,11 @@ public class Rows
    */
   public static List<Object> toGroupKey(long timeStamp, InputRow inputRow)
   {
-    final Map<String, Set<String>> dims = Maps.newTreeMap();
-    for (final String dim : inputRow.getDimensions()) {
-      final Set<String> dimValues = ImmutableSortedSet.copyOf(inputRow.getDimension(dim));
+    final Map<String, Set<Object>> dims = Maps.newTreeMap();
+    for (final DimensionSchema dim : inputRow.getDimensions()) {
+      final Set<Object> dimValues = ImmutableSortedSet.copyOf(inputRow.getDimension(dim.getName()));
       if (dimValues.size() > 0) {
-        dims.put(dim, dimValues);
+        dims.put(dim.getName(), dimValues);
       }
     }
     return ImmutableList.of(

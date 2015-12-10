@@ -26,6 +26,7 @@ import com.google.common.collect.Lists;
 import com.metamx.common.IAE;
 import com.metamx.common.logger.Logger;
 import com.metamx.common.parsers.ParseException;
+import io.druid.data.input.impl.DimensionSchema;
 import org.joda.time.DateTime;
 
 import java.util.Arrays;
@@ -44,14 +45,6 @@ public class MapBasedRow implements Row
     public String apply(final Object o)
     {
       return String.valueOf(o);
-    }
-  };
-
-  private static final Function<Object, Float> TO_FLOAT = new Function<Object, Float>() {
-    @Override
-    public Float apply(final Object o)
-    {
-      return Float.valueOf(String.valueOf(o));
     }
   };
 
@@ -97,7 +90,7 @@ public class MapBasedRow implements Row
   }
 
   @Override
-  public List<String> getDimension(String dimension)
+  public List<Object> getDimension(String dimension)
   {
     final Object dimValue = event.get(dimension);
 
@@ -105,28 +98,9 @@ public class MapBasedRow implements Row
       return Collections.emptyList();
     } else if (dimValue instanceof List) {
       // guava's toString function fails on null objects, so please do not use it
-      return Lists.transform(
-          (List) dimValue,
-          TO_STRING_INCLUDING_NULL);
+      return (List<Object>) dimValue;
     } else {
-      return Collections.singletonList(String.valueOf(dimValue));
-    }
-  }
-
-  @Override
-  public List<Float> getFloatDimension(String dimension)
-  {
-    final Object floatDimValue = event.get(dimension);
-
-    if (floatDimValue == null) {
-      return Collections.emptyList();
-    } else if (floatDimValue instanceof List) {
-      return Lists.transform(
-          (List) floatDimValue,
-          TO_FLOAT
-      );
-    } else {
-      return Collections.singletonList(Float.valueOf(String.valueOf(floatDimValue)));
+      return Collections.singletonList(dimValue);
     }
   }
 

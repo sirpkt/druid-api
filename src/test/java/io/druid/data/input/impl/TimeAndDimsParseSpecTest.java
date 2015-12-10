@@ -51,7 +51,7 @@ public class TimeAndDimsParseSpecTest
     String jsonStr = "{"
                      + "\"format\":\"timeAndDims\","
                      + "\"timestampSpec\": { \"column\": \"tcol\" },"
-                     + "\"dimensionsSpec\": { \"dimensions\": [\"host\"] }"
+                     + "\"dimensionsSpec\": { \"dimensions\": [ { \"name\": \"host\", \"type\": \"String\" } ] } }"
                      + "}";
 
     ParseSpec actual = mapper.readValue(
@@ -64,7 +64,7 @@ public class TimeAndDimsParseSpecTest
     Assert.assertEquals(
         new TimeAndDimsParseSpec(
             new TimestampSpec("tcol", null, null),
-            new DimensionsSpec(ImmutableList.of("host"), null, null, null)
+            new DimensionsSpec(ImmutableList.of(new DimensionSchema("host", "String")), null, null)
         ),
         actual
     );

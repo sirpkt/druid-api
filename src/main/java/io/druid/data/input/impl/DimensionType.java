@@ -17,26 +17,36 @@
 * under the License.
 */
 
-package io.druid.data.input;
+package io.druid.data.input.impl;
 
-import io.druid.data.input.impl.DimensionSchema;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 
-import java.util.List;
-
-/**
- * An InputRow is the interface definition of an event being input into the data ingestion layer.
- *
- * An InputRow is a Row with a self-describing list of the dimensions available.  This list is used to
- * implement "schema-less" data ingestion that allows the system to add new dimensions as they appear.
- *
- */
-public interface
-    InputRow extends Row
+public enum DimensionType
 {
-  /**
-   * Returns the dimensions that exist in this row.
-   *
-   * @return the dimensions that exist in this row.
-   */
-  public List<DimensionSchema> getDimensions();
+  STRING,
+  FLOAT;
+
+  @JsonValue
+  @Override
+  public String toString()
+  {
+    return this.name().toLowerCase();
+  }
+
+  @JsonCreator
+  public static DimensionType fromString(String name)
+  {
+    return valueOf(name.toUpperCase());
+  }
+
+  public static boolean isValid(String name)
+  {
+    try {
+      DimensionType type = fromString(name);
+    } catch (IllegalArgumentException e) {
+      return false;
+    }
+    return true;
+  }
 }

@@ -19,6 +19,7 @@
 
 package io.druid.data.input;
 
+import io.druid.data.input.impl.DimensionSchema;
 import org.joda.time.DateTime;
 
 import java.util.ArrayList;
@@ -29,39 +30,32 @@ import java.util.Map;
  */
 public class MapBasedInputRow extends MapBasedRow implements InputRow
 {
-  private final List<String> dimensions;
-  private final List<String> floatDimensions;
+  private final List<DimensionSchema> dimensions;
 
   public MapBasedInputRow(
       long timestamp,
-      List<String> dimensions,
-      List<String> floatDimensions,
+      List<DimensionSchema> dimensions,
       Map<String, Object> event
   )
   {
     super(timestamp, event);
     this.dimensions = dimensions;
-    this.floatDimensions = floatDimensions;
   }
 
   public MapBasedInputRow(
       DateTime timestamp,
-      List<String> dimensions,
-      List<String> floatDimensions,
+      List<DimensionSchema> dimensions,
       Map<String, Object> event
   )
   {
     super(timestamp, event);
     this.dimensions = dimensions;
-    this.floatDimensions = floatDimensions;
   }
 
   @Override
-  public List<String> getDimensions()
+  public List<DimensionSchema> getDimensions()
   {
-    List<String> result = new ArrayList<String>(dimensions);
-    result.addAll(floatDimensions);
-    return result;
+    return dimensions;
   }
 
   @Override
@@ -71,7 +65,6 @@ public class MapBasedInputRow extends MapBasedRow implements InputRow
            "timestamp=" + new DateTime(getTimestampFromEpoch()) +
            ", event=" + getEvent() +
            ", dimensions=" + dimensions +
-           ", floatDimentions=" + floatDimensions +
            '}';
   }
 }
