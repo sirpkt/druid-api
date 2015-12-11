@@ -73,7 +73,7 @@ public class FileIteratingFirehoseTest
       final List<String> results = Lists.newArrayList();
 
       while (firehose.hasMore()) {
-        results.add(Joiner.on("|").join(firehose.nextRow().getDimension("x")));
+        results.add(Joiner.on("|").join(firehose.nextRow().getDimension(new DimensionSchema("x", "String"))));
       }
 
       Assert.assertEquals(fixture.rhs, results);

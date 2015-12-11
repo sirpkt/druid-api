@@ -27,8 +27,10 @@ import com.metamx.common.IAE;
 import com.metamx.common.logger.Logger;
 import com.metamx.common.parsers.ParseException;
 import io.druid.data.input.impl.DimensionSchema;
+import io.druid.data.input.impl.DimensionType;
 import org.joda.time.DateTime;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -90,17 +92,25 @@ public class MapBasedRow implements Row
   }
 
   @Override
-  public List<Object> getDimension(String dimension)
+  public List<Object> getDimension(DimensionSchema dimension)
   {
-    final Object dimValue = event.get(dimension);
+    final Object dimValue = event.get(dimension.getName());
+    final DimensionType dimType = dimension.getType();
 
     if (dimValue == null) {
       return Collections.emptyList();
     } else if (dimValue instanceof List) {
-      // guava's toString function fails on null objects, so please do not use it
-      return (List<Object>) dimValue;
+      return Lists.transform(
+          (List<Object>)dimValue,
+          new Function< Object, Object > () {
+            @Override
+            public Object apply(Object o) {
+              return dimType.typeCast(o);
+            }
+      }
+      );
     } else {
-      return Collections.singletonList(dimValue);
+      return Collections.singletonList(dimType.typeCast(dimValue));
     }
   }
 

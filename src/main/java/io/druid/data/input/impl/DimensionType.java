@@ -21,23 +21,56 @@ package io.druid.data.input.impl;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import java.util.List;
 
 public enum DimensionType
 {
-  STRING,
-  FLOAT;
+  STRING("STRING", "java.lang.String"),
+  FLOAT("FLOAT", "java.lang.Float");
+
+  private final String name;
+  private final Class clazz;
+
+  private DimensionType(String name, String clazz) {
+    this.name = name;
+    Class loadedClass = null;
+    try {
+      loadedClass = Class.forName(clazz);
+    } catch (ClassNotFoundException e) {
+      // However, should not reach here
+      e.printStackTrace();
+    }
+    this.clazz = loadedClass;
+  }
 
   @JsonValue
   @Override
   public String toString()
   {
-    return this.name().toLowerCase();
+    return name.toLowerCase();
   }
 
   @JsonCreator
   public static DimensionType fromString(String name)
   {
     return valueOf(name.toUpperCase());
+  }
+
+  public Class getClazz()
+  {
+    return clazz;
+  }
+
+  public Object typeCast(Object o) {
+    Object ret = null;
+    switch(name) {
+      case "STRING":
+        ret = String.valueOf(o);
+        break;
+      case "Float":
+        ret = ((Double) o).floatValue();
+    }
+    return ret;
   }
 
   public static boolean isValid(String name)

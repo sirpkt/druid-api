@@ -60,7 +60,7 @@ public class Rows
   {
     final Map<String, Set<Object>> dims = Maps.newTreeMap();
     for (final DimensionSchema dim : inputRow.getDimensions()) {
-      final Set<Object> dimValues = ImmutableSortedSet.copyOf(inputRow.getDimension(dim.getName()));
+      final Set<Object> dimValues = ImmutableSortedSet.copyOf(inputRow.getDimension(dim));
       if (dimValues.size() > 0) {
         dims.put(dim.getName(), dimValues);
       }

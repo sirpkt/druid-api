@@ -81,9 +81,9 @@ public class DelimitedParseSpec extends ParseSpec
   {
     for (DimensionSchema columnSchema : usedCols) {
       String columnName = columnSchema.getName();
-      String columnType = columnSchema.getType();
+      DimensionType columnType = columnSchema.getType();
       Preconditions.checkArgument(columns.contains(columnName), "column[%s] not in columns.", columnName);
-      Preconditions.checkArgument(DimensionType.isValid(columnType), "type[%s] not supported yet.", columnType);
+      Preconditions.checkArgument(columnType != null, "type[%s] not supported yet.", columnType);
     }
   }
 

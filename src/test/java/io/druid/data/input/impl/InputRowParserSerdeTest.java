@@ -63,8 +63,8 @@ public class InputRowParserSerdeTest
     );
     Assert.assertEquals(ImmutableList.of(new DimensionSchema("bar", "String"), new DimensionSchema("foo", "String")),
         parsed.getDimensions());
-    Assert.assertEquals(ImmutableList.of("x"), parsed.getDimension("foo"));
-    Assert.assertEquals(ImmutableList.of("y"), parsed.getDimension("bar"));
+    Assert.assertEquals(ImmutableList.of("x"), parsed.getDimension(new DimensionSchema("foo", "String")));
+    Assert.assertEquals(ImmutableList.of("y"), parsed.getDimension(new DimensionSchema("bar", "String")));
     Assert.assertEquals(new DateTime("2000").getMillis(), parsed.getTimestampFromEpoch());
   }
 
@@ -80,8 +80,8 @@ public class InputRowParserSerdeTest
       InputRow parsed = testCharsetParseHelper(testCharset);
       Assert.assertEquals(ImmutableList.of(new DimensionSchema("bar", "String"), new DimensionSchema("foo", "String")),
           parsed.getDimensions());
-      Assert.assertEquals(ImmutableList.of("x"), parsed.getDimension("foo"));
-      Assert.assertEquals(ImmutableList.of("y"), parsed.getDimension("bar"));
+      Assert.assertEquals(ImmutableList.of("x"), parsed.getDimension(new DimensionSchema("foo", "String")));
+      Assert.assertEquals(ImmutableList.of("y"), parsed.getDimension(new DimensionSchema("bar", "String")));
       Assert.assertEquals(new DateTime("3000").getMillis(), parsed.getTimestampFromEpoch());
     }
   }
@@ -114,8 +114,8 @@ public class InputRowParserSerdeTest
     );
     Assert.assertEquals(ImmutableList.of(new DimensionSchema("bar", "String"), new DimensionSchema("foo", "String")),
         parsed.getDimensions());
-    Assert.assertEquals(ImmutableList.of("x"), parsed.getDimension("foo"));
-    Assert.assertEquals(ImmutableList.of("y"), parsed.getDimension("bar"));
+    Assert.assertEquals(ImmutableList.of("x"), parsed.getDimension(new DimensionSchema("foo", "String")));
+    Assert.assertEquals(ImmutableList.of("y"), parsed.getDimension(new DimensionSchema("bar", "String")));
     Assert.assertEquals(1000, parsed.getTimestampFromEpoch());
   }
 
@@ -147,10 +147,10 @@ public class InputRowParserSerdeTest
     );
     Assert.assertEquals(ImmutableList.of(new DimensionSchema("foo", "String"), new DimensionSchema("values", "String")),
         parsed.getDimensions());
-    Assert.assertEquals(ImmutableList.of(), parsed.getDimension("foo"));
+    Assert.assertEquals(ImmutableList.of(), parsed.getDimension(new DimensionSchema("foo", "String")));
     Assert.assertEquals(
-        ImmutableList.of(1412705931123L, 123.456, 1.23E47, "hello"),
-        parsed.getDimension("values")
+        ImmutableList.of("1412705931123", "123.456", "1.23E47", "hello"),
+        parsed.getDimension(new DimensionSchema("values", "String"))
     );
     Assert.assertEquals(Float.POSITIVE_INFINITY, parsed.getFloatMetric("toobig"));
     Assert.assertEquals(123E64, parsed.getRaw("toobig"));
@@ -192,10 +192,10 @@ public class InputRowParserSerdeTest
         new DimensionSchema("value", "Float"),
         new DimensionSchema("values", "String")),
         parsed.getDimensions());
-    Assert.assertEquals(ImmutableList.of(), parsed.getDimension("foo"));
+    Assert.assertEquals(ImmutableList.of(), parsed.getDimension(new DimensionSchema("foo", "String")));
     Assert.assertEquals(
-        ImmutableList.of(1412705931123L, 123.456, 1.23E47, "hello"),
-        parsed.getDimension("values")
+        ImmutableList.of("1412705931123", "123.456", "1.23E47", "hello"),
+        parsed.getDimension(new DimensionSchema("values", "String"))
     );
     Assert.assertEquals(123456789000L, parsed.getRaw("long"));
     Assert.assertEquals(1.23456791E11f, parsed.getFloatMetric("long"));
@@ -267,15 +267,15 @@ public class InputRowParserSerdeTest
         new DimensionSchema("metA", "String"), new DimensionSchema("timestamp", "String"),
         new DimensionSchema("foo.bar1", "String"), new DimensionSchema("blah", "String"),
         new DimensionSchema("newmet", "String"), new DimensionSchema("baz", "String")), parsed.getDimensions());
-    Assert.assertEquals(ImmutableList.of("aaa"), parsed.getDimension("foobar1"));
-    Assert.assertEquals(ImmutableList.of("bbb"), parsed.getDimension("foobar2"));
-    Assert.assertEquals(ImmutableList.of(1L), parsed.getDimension("baz0"));
-    Assert.assertEquals(ImmutableList.of(2L), parsed.getDimension("baz1"));
-    Assert.assertEquals(ImmutableList.of(3L), parsed.getDimension("baz2"));
-    Assert.assertEquals(ImmutableList.of("Hello world!"), parsed.getDimension("foo.bar1"));
-    Assert.assertEquals(ImmutableList.of("asdf"), parsed.getDimension("hey0barx"));
-    Assert.assertEquals(ImmutableList.of(456L), parsed.getDimension("metA"));
-    Assert.assertEquals(ImmutableList.of(5L), parsed.getDimension("newmet"));
+    Assert.assertEquals(ImmutableList.of("aaa"), parsed.getDimension(new DimensionSchema("foobar1", "String")));
+    Assert.assertEquals(ImmutableList.of("bbb"), parsed.getDimension(new DimensionSchema("foobar2", "String")));
+    Assert.assertEquals(ImmutableList.of("1"), parsed.getDimension(new DimensionSchema("baz0", "String")));
+    Assert.assertEquals(ImmutableList.of("2"), parsed.getDimension(new DimensionSchema("baz1", "String")));
+    Assert.assertEquals(ImmutableList.of("3"), parsed.getDimension(new DimensionSchema("baz2", "String")));
+    Assert.assertEquals(ImmutableList.of("Hello world!"), parsed.getDimension(new DimensionSchema("foo.bar1", "String")));
+    Assert.assertEquals(ImmutableList.of("asdf"), parsed.getDimension(new DimensionSchema("hey0barx", "String")));
+    Assert.assertEquals(ImmutableList.of("456"), parsed.getDimension(new DimensionSchema("metA", "String")));
+    Assert.assertEquals(ImmutableList.of("5"), parsed.getDimension(new DimensionSchema("newmet", "String")));
     Assert.assertEquals(new DateTime("2999").getMillis(), parsed.getTimestampFromEpoch());
 
     String testSpec = "{\"enabled\": true,\"useFieldDiscovery\": true, \"fields\": [\"parseThisRootField\"]}";

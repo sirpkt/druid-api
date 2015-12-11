@@ -25,7 +25,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class DimensionSchema
 {
   private final String name;
-  private final String type;
+  private final DimensionType type;
 
   @JsonCreator
   public DimensionSchema(
@@ -34,7 +34,7 @@ public class DimensionSchema
   )
   {
     this.name = name;
-    this.type = type;
+    this.type = DimensionType.isValid(type) ? DimensionType.fromString(type) : null;
   }
 
   @JsonProperty
@@ -44,7 +44,7 @@ public class DimensionSchema
   }
 
   @JsonProperty
-  public String getType()
+  public DimensionType getType()
   {
     return type;
   }
@@ -74,5 +74,13 @@ public class DimensionSchema
     }
 
     return true;
+  }
+
+  @Override
+  public int hashCode()
+  {
+    int result = name != null ? name.hashCode() : 0;
+    result = 31 * result + (type != null ? type.hashCode() : 0);
+    return result;
   }
 }

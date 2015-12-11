@@ -22,6 +22,7 @@ package io.druid.data.input;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.metamx.common.parsers.ParseException;
+import io.druid.data.input.impl.DimensionSchema;
 import org.joda.time.DateTime;
 
 import java.util.List;
@@ -60,7 +61,7 @@ public interface Row extends Comparable<Row>
    *
    * @return the list of values for the provided column name
    */
-  public List<Object> getDimension(String dimension);
+  public List<Object> getDimension(DimensionSchema dimension);
 
   /**
    * Returns the raw dimension value for the given column name. This is different from #getDimension which
