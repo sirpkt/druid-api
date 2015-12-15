@@ -61,8 +61,8 @@ public enum DimensionType
     return clazz;
   }
 
-  public Object typeCast(Object o) {
-    Object ret = null;
+  public Comparable typeCast(Object o) {
+    Comparable ret = null;
     switch(name) {
       case "STRING":
         ret = String.valueOf(o);

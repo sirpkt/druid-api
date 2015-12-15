@@ -61,7 +61,7 @@ public interface Row extends Comparable<Row>
    *
    * @return the list of values for the provided column name
    */
-  public List<Object> getDimension(DimensionSchema dimension);
+  public List<Comparable> getDimension(DimensionSchema dimension);
 
   /**
    * Returns the raw dimension value for the given column name. This is different from #getDimension which

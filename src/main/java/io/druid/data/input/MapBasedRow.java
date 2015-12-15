@@ -92,7 +92,7 @@ public class MapBasedRow implements Row
   }
 
   @Override
-  public List<Object> getDimension(DimensionSchema dimension)
+  public List<Comparable> getDimension(DimensionSchema dimension)
   {
     final Object dimValue = event.get(dimension.getName());
     final DimensionType dimType = dimension.getType();
@@ -102,9 +102,9 @@ public class MapBasedRow implements Row
     } else if (dimValue instanceof List) {
       return Lists.transform(
           (List<Object>)dimValue,
-          new Function< Object, Object > () {
+          new Function< Object, Comparable > () {
             @Override
-            public Object apply(Object o) {
+            public Comparable apply(Object o) {
               return dimType.typeCast(o);
             }
       }

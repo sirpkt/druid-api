@@ -22,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  */
-public class DimensionSchema
+public class DimensionSchema implements Comparable<DimensionSchema>
 {
   private final String name;
   private final DimensionType type;
@@ -74,6 +74,12 @@ public class DimensionSchema
     }
 
     return true;
+  }
+
+  @Override
+  public int compareTo(DimensionSchema dimensionSchema)
+  {
+    return this.toString().compareTo(dimensionSchema.toString());
   }
 
   @Override

@@ -58,9 +58,9 @@ public class Rows
    */
   public static List<Object> toGroupKey(long timeStamp, InputRow inputRow)
   {
-    final Map<String, Set<Object>> dims = Maps.newTreeMap();
+    final Map<String, Set<Comparable>> dims = Maps.newTreeMap();
     for (final DimensionSchema dim : inputRow.getDimensions()) {
-      final Set<Object> dimValues = ImmutableSortedSet.copyOf(inputRow.getDimension(dim));
+      final Set<Comparable> dimValues = ImmutableSortedSet.copyOf(inputRow.getDimension(dim));
       if (dimValues.size() > 0) {
         dims.put(dim.getName(), dimValues);
       }
