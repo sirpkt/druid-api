@@ -19,6 +19,7 @@ package io.druid.data.input.impl;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.Preconditions;
 
 /**
  */
@@ -52,6 +53,14 @@ public class DimensionSchema implements Comparable<DimensionSchema>
   @Override
   public String toString() {
     return name + ":" + type;
+  }
+
+  public static DimensionSchema fromString(String schemaString)
+  {
+    String[] dimSchema = schemaString.split(":");
+    Preconditions.checkArgument(dimSchema.length == 2, "%s is not valid schema string", schemaString);
+
+    return new DimensionSchema(dimSchema[0], dimSchema[1]);
   }
 
   @Override

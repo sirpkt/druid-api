@@ -21,17 +21,17 @@ package io.druid.data.input.impl;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import java.util.List;
 
 public enum DimensionType
 {
-  STRING("STRING", "java.lang.String"),
-  FLOAT("FLOAT", "java.lang.Float");
+  STRING("STRING", "java.lang.String", ""),
+  FLOAT("FLOAT", "java.lang.Float", 0.0f);
 
   private final String name;
   private final Class clazz;
+  private final Comparable nullReplacement;
 
-  private DimensionType(String name, String clazz) {
+  private DimensionType(String name, String clazz, Comparable nullReplacement) {
     this.name = name;
     Class loadedClass = null;
     try {
@@ -40,6 +40,7 @@ public enum DimensionType
       // However, should not reach here
       e.printStackTrace();
     }
+    this.nullReplacement = nullReplacement;
     this.clazz = loadedClass;
   }
 
@@ -59,6 +60,10 @@ public enum DimensionType
   public Class getClazz()
   {
     return clazz;
+  }
+
+  public Comparable getNullReplacement() {
+    return nullReplacement;
   }
 
   public Comparable typeCast(Object o) {
